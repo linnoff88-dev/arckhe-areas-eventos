@@ -1,38 +1,38 @@
 #!/usr/bin/env python3
 """Traduz i18n/source.json (PT) para EN/ES pelo tradutor central da ASSINATURA
-(`~/projetos/wifi/scripts/ARCKHÉ-traduz`, ARCKHÉ_TRADUCAO_*, hoje Sonnet 5.5), sem chave de API. CODEX_MODELO=<id> forÃ§a outro modelo.
-SÃ³ manda texto (nunca HTML/cÃ³digo). Cache por chave em i18n/<lang>.json: reenvia apenas o que falta ou mudou
-(hash da fonte em i18n/<lang>.hash.json). Valida chaves e placeholders {x}; unidade invÃ¡lida volta na prÃ³xima rodada.
+(`~/projetos/wifi/scripts/ARCKHê-traduz`, ARCKHê_TRADUCAO_*, hoje Sonnet 5.5), sem chave de API. CODEX_MODELO=<id> forêÂ§a outro modelo.
+SêÂ³ manda texto (nunca HTML/cêÂ³digo). Cache por chave em i18n/<lang>.json: reenvia apenas o que falta ou mudou
+(hash da fonte em i18n/<lang>.hash.json). Valida chaves e placeholders {x}; unidade invêÂ¡lida volta na prêÂ³xima rodada.
 Uso: python3 scripts/traduzir.py en es"""
 import sys,json,os,re,subprocess,tempfile,hashlib,time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];I=ROOT/'i18n'
 MODELO=os.environ.get('CODEX_MODELO','');PARALELO=4;LOTE_CHARS=9000;RODADAS=3
-NOMES={'en':'English (US)','es':'Spanish (neutral Latin American, "tÃº")'}
+NOMES={'en':'English (US)','es':'Spanish (neutral Latin American, "têÂº")'}
 SISTEMA="""You translate a short Portuguese (Brazil) course into {nome}. The course explains the nine subject areas of the
-site eventos.ARCKHÉ.pro (ARCKHÉ, a free AI education community). Audience: professionals and managers, plain adult language,
+site eventos.ARCKHê.pro (ARCKHê, a free AI education community). Audience: professionals and managers, plain adult language,
 short sentences, address the reader as "you". No hype.
 Rules:
 - Input is a JSON object {{key: Portuguese text}}. Output the SAME keys with the translated text. Never add, drop or rename keys.
-- Keep unchanged: URLs, file names, commands, code, product and course names (ARCKHÉ, ARCKHÉ AI, ARCKHÉ.PRO, OSWork, LOOP-R,
-  Gestoria, Claude Code, Codex, WebMCP, JEV/Jev, RSI, AGI-ready, Content2Video, ARCKHÉCCBOT, kit names like agente-claude-codex),
+- Keep unchanged: URLs, file names, commands, code, product and course names (ARCKHê, ARCKHê AI, ARCKHê.PRO, OSWork, LOOP-R,
+  Gestoria, Claude Code, Codex, WebMCP, JEV/Jev, RSI, AGI-ready, Content2Video, ARCKHêCCBOT, kit names like agente-claude-codex),
   placeholders in braces like {{data}} {{n}} {{id}}, and anything between < and > is a fill-in hint: translate the words inside
   but keep the < > marks.
-- Area names: "GestÃ£o de IA" -> {gestao}; "IA Cultivada" -> {cult}; keep "Claude â†’ Codex", "Codex + Claude", "OSWork", "RSI",
+- Area names: "GestêÂ£o de IA" -> {gestao}; "IA Cultivada" -> {cult}; keep "Claude ê¢â â Codex", "Codex + Claude", "OSWork", "RSI",
   "JEV", "WebMCP", "AGI-ready" as they are.
 - Keep quotation marks around phrases quoted from the site. Keep numbers as they are.
 - Very short UI labels (buttons, kickers in CAPS): translate tersely and keep CAPS when the source is in caps.
 Return ONLY the JSON object (no code fences, no comments)."""
-AREA={'en':('"AI Management"','"Cultivated AI"'),'es':('"GestiÃ³n de IA"','"IA Cultivada"')}
+AREA={'en':('"AI Management"','"Cultivated AI"'),'es':('"GestiêÂ³n de IA"','"IA Cultivada"')}
 
-_TRADUTOR=os.path.expanduser("~/projetos/wifi/scripts/ARCKHÉ-traduz")
+_TRADUTOR=os.path.expanduser("~/projetos/wifi/scripts/ARCKHê-traduz")
 def chamar_tradutor(pedido:str,timeout:int=900)->str:
- """TraduÃ§Ã£o pelo tradutor central do ARCKHÉ (ARCKHÉ_TRADUCAO_* em ~/.config/ARCKHÉ/modelos.env). Assinatura, nunca API."""
+ """TraduêÂ§êÂ£o pelo tradutor central do ARCKHê (ARCKHê_TRADUCAO_* em ~/.config/ARCKHê/modelos.env). Assinatura, nunca API."""
  if os.path.exists(_TRADUTOR):
   cmd=[_TRADUTOR]+(['--motor','claude' if MODELO.startswith('claude-') else 'codex','--modelo',MODELO] if MODELO else [])
- else:  # fora da mÃ¡quina do Nei: Claude Code da assinatura com o modelo da variÃ¡vel (padrÃ£o Sonnet 5.5)
-  cmd=["claude","-p","--model",MODELO or os.environ.get("ARCKHÉ_TRADUCAO_MODELO","claude-sonnet-5-5"),"--output-format","text","--tools",""]
+ else:  # fora da mêÂ¡quina do Nei: Claude Code da assinatura com o modelo da variêÂ¡vel (padrêÂ£o Sonnet 5.5)
+  cmd=["claude","-p","--model",MODELO or os.environ.get("ARCKHê_TRADUCAO_MODELO","claude-sonnet-5-5"),"--output-format","text","--tools",""]
  env={k:v for k,v in os.environ.items() if k not in ("ANTHROPIC_API_KEY","OPENAI_API_KEY","CLAUDECODE")}
  r=subprocess.run(cmd,input=pedido,capture_output=True,text=True,timeout=timeout,env=env)
  if r.returncode!=0 or not r.stdout.strip():raise RuntimeError(f"tradutor falhou rc={r.returncode}: {(r.stderr or r.stdout)[-300:]}")

@@ -1,5 +1,5 @@
-"""Catálogo de tradução: extrai as unidades de texto do conteúdo autoral (PT) e aplica EN/ES por chave.
-Código, IDs, URLs e slugs nunca vão para tradução."""
+"""Catálogo de traduçêo: extrai as unidades de texto do conteúdo autoral (PT) e aplica EN/ES por chave.
+Código, IDs, URLs e slugs nunca vêo para traduçêo."""
 import json,copy
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];I18N=ROOT/'i18n'
